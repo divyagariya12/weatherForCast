@@ -36,4 +36,12 @@ export default StyleSheet.create({
     alignItems: 'center',
     height: '100%',
   },
+  btn: {
+    width: 70,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    marginTop: 20,
+  },
 });

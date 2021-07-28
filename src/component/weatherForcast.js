@@ -1,7 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
-import {View, Image, Text, FlatList} from 'react-native';
+import {View, Image, Text, FlatList, TouchableHighlight} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 import moment from 'moment';
 import {useDispatch, useSelector} from 'react-redux';
@@ -22,6 +22,7 @@ export default () => {
     currentIcon: '',
     currentDescription: '',
     dailyWeatherData: null,
+    isError: false,
   });
 
   const action = bindActionCreators(
@@ -37,12 +38,18 @@ export default () => {
   useEffect(() => {
     Geolocation.getCurrentPosition(
       ({coords}) => {
-        let cords = {
+        // let cords = {
+        //   lat: coords.latitude,
+        //   long: coords.longitude,
+        // };
+        // action.getCurrentWD(cords);
+        // action.getDailyWD(cords);
+        setState({
+          ...state,
           lat: coords.latitude,
           long: coords.longitude,
-        };
-        action.getCurrentWD(cords);
-        action.getDailyWD(cords);
+        });
+        getData();
       },
       error => {
         // See error code charts below.
@@ -52,16 +59,35 @@ export default () => {
     );
   }, []);
 
+  const getData = () => {
+    let cords = {
+      lat: state.lat,
+      long: state.long,
+    };
+    action.getCurrentWD(cords);
+    action.getDailyWD(cords);
+  };
+
   useEffect(() => {
+    console.log('1', currentWDList);
+    console.log('2', dailyWeatherList);
     if (currentWDList?.loading || dailyWeatherList.loading) {
       setState({
         ...state,
         isLoading: true,
       });
+    }
+    if (currentWDList?.isError || dailyWeatherList?.isError) {
+      setState({
+        ...state,
+        isLoading: false,
+        isError: true,
+      });
     } else {
       setState({
         ...state,
         isLoading: false,
+        isError: false,
         location: currentWDList?.data?.name,
         currentTemp: currentWDList?.data?.main?.temp,
         currentIcon: currentWDList?.data?.weather[0]?.icon,
@@ -115,6 +141,16 @@ export default () => {
         <View style={styles.loaderContainer}>
           <LottieView source={require('../loader.json')} autoPlay />
           <Text style={styles.mainHeading}>Loading....</Text>
+        </View>
+      ) : state.isError ? (
+        <View style={styles.loaderContainer}>
+          <Text style={styles.mainHeading}>Something went wrong</Text>
+          <TouchableHighlight
+            underlayColor={'rgba(0,0,0,0.2)'}
+            style={styles.btn}
+            onPress={() => getData()}>
+            <Text>Retry</Text>
+          </TouchableHighlight>
         </View>
       ) : (
         <FlatList
