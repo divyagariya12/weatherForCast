@@ -110,15 +110,24 @@ export default () => {
   };
 
   return (
-    <FlatList
-      data={state.dailyWeatherData}
-      keyExtractor={(i, index) => index.toString()}
-      ListHeaderComponent={() => renderHeader()}
-      renderItem={({item}) => renderItem(item)}
-      ItemSeparatorComponent={() => <View style={styles.ItemSeparator} />}
-      ListFooterComponent={() => {
-        return <View style={styles.listFooter} />;
-      }}
-    />
+    <>
+      {state.isLoading ? (
+        <View style={styles.loaderContainer}>
+          <LottieView source={require('../loader.json')} autoPlay />
+          <Text style={styles.mainHeading}>Loading....</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={state.dailyWeatherData}
+          keyExtractor={(i, index) => index.toString()}
+          ListHeaderComponent={() => renderHeader()}
+          renderItem={({item}) => renderItem(item)}
+          ItemSeparatorComponent={() => <View style={styles.ItemSeparator} />}
+          ListFooterComponent={() => {
+            return <View style={styles.listFooter} />;
+          }}
+        />
+      )}
+    </>
   );
 };
