@@ -1,12 +1,18 @@
 import React from 'react';
-import {SafeAreaView,View,Text} from 'react-native';
+import {SafeAreaView} from 'react-native';
+import {Provider, useDispatch} from 'react-redux';
+import {createStore, applyMiddleware, bindActionCreators} from 'redux';
+import thunk from 'redux-thunk';
+import rootReducer from './src/store/reducers';
+import WeatherApp from './src/component/weatherForcast';
 
 export default () => {
+  let store = createStore(rootReducer, applyMiddleware(thunk));
   return (
+    <Provider store={store}>
       <SafeAreaView>
-        <View>
-          <Text>Hello App!</Text>
-        </View>
+        <WeatherApp />
       </SafeAreaView>
+    </Provider>
   );
 };
